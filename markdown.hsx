@@ -1,0 +1,28 @@
+# Let's pretend
+
+<Header />
+<Banner banner="Hello World"/>
+
+<Trailer> </Trailer>
+<Trailer who="Michael"> </Trailer>
+
+That all that is valid. Here's the content:
+
+<Content /> <!-- the space is required -->
+
+And here's a trailer:
+
+<Trailer> This is some footer text injected into the trailer </Trailer>
+
+<Trailer>
+This is some footer text 
+<Trailer> This is some footer text injected into the trailer </Trailer>
+injected into the trailer
+</Trailer>
+
+
+<Trailer />  <!-- Note, this version of the trailer leaves the args.__text__ reference in.
+
+<Trailer __text__="" />  <!-- this is needed to explicityly silence that -->
+
+The End

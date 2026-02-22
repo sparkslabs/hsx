@@ -1,0 +1,27 @@
+<html>
+<PAIRED   attr1="'Hello'  World"    attr2='Game "Over"'    >
+# Let's pretend
+
+<Banner>
+
+This is some text for a banner...
+
+</Banner>
+
+<sample />
+
+<Header what='Hello' who="World"/>
+<Header what='Game'  who="Over"/>
+
+That all that is valid. Here's the content:
+
+<Content />
+
+And here's a trailer:
+
+<Trailer />
+
+The End
+
+</PAIRED>
+</html>
