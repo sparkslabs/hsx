@@ -8,13 +8,12 @@ It replaces XML-like tags in a source file with the contents of fragment
 files stored in a directory.
 
 Fragments are plain text files (for example markdown, HTML, CSS) and are
-composited using JSX like instructions.
+composited using JSX like instructions, included by tag name.
 
 ## Code Maturity
 
 This code is experimental, and version 0.0.1
 See SEMVER.md for how I use semantic versioning
-
 
 ## Author
 
@@ -75,9 +74,6 @@ copies across my filesystem.
 Extend current template processing to build templates from HSX files
 
 
-
 ## License
 
 Apache License 2.0 (as usual)
-
-
