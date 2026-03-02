@@ -2,7 +2,7 @@ hsx
 ===
 **Version:** 0.0.1
 
-hsx is (will be) a small macro-style preprocessor for static content.
+hsx is a small macro-style preprocessor for static content.
 
 It replaces XML-like tags in a source file with the contents of fragment
 files stored in a directory.
