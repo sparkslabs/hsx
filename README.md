@@ -1,5 +1,6 @@
 hsx
 ===
+**Version:** 0.0.1
 
 hsx is a small macro-style preprocessor for static content.
 
