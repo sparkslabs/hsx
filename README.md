@@ -49,9 +49,9 @@ Defaults:
 
 * Fragment directory: `frags`
 
-* Fragment extension: `.hsx`
+* Fragment extension: `.htx`
 
-* Source file: `markdown.hsx`
+* Source file: `markdown.htx`
 
 
 

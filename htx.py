@@ -261,9 +261,9 @@ def stream_Evaluate(text, tag_regexes):
 if __name__ == "__main__":
     import sys
 
-    TAG_EXTENSION = ".hsx"
-    base_dir = "frags"
-    source_file = "markdown.hsx"
+    TAG_EXTENSION = ".htx"
+    base_dir = "_fragx"
+    source_file = "markdown.htx"
     destfile = None
 
     # Fragile options handling
@@ -279,7 +279,7 @@ if __name__ == "__main__":
         where = sys.argv.index("--destfile")
         destfile = sys.argv[where+1]
 
-    # TAG_EXTENSION = ".hsx"
+    # TAG_EXTENSION = ".htx"
     tag_defs = get_tagdefs(base_dir)
     tag_regexes = makeTagParser(tag_defs)
 
