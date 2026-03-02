@@ -1,13 +1,19 @@
-htx
+hsx
 ===
 
-htx is a small macro-style preprocessor for static content.
+hsx is a small macro-style preprocessor for static content.
 
 It replaces XML-like tags in a source file with the contents of fragment
 files stored in a directory.
 
 Fragments are plain text files (for example markdown, HTML, CSS) and are
 included by tag name.
+
+## Code Maturity
+
+This code is experimental, and version 0.0.1
+See SEMVER.md for how I use semantic versioning
+
 
 ## Author
 
@@ -34,9 +40,9 @@ It does not implement loops, conditionals, or a templating language.
 
 Assuming copied onto your path somewhere
 
-> htx.py
+> hsx.py
 
-> htx.py [OPTIONS]
+> hsx.py [OPTIONS]
 
 Where options are:
 
@@ -49,9 +55,9 @@ Defaults:
 
 * Fragment directory: `frags`
 
-* Fragment extension: `.htx`
+* Fragment extension: `.hsx`
 
-* Source file: `markdown.htx`
+* Source file: `markdown.hsx`
 
 
 
