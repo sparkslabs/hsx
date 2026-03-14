@@ -7,12 +7,11 @@ import os
 
 def slurp(filename,binary=False, encoding="utf-8"):
     """Utility to slurp a file from the filesystem"""
-    f = open(filename, "rb")
-    x = f.read()
-    if not binary:
-        x = x.decode(encoding)
-    f.close()
-    return x
+    with open(filename, "rb") as f:
+        x = f.read()
+        if not binary:
+            x = x.decode(encoding)
+        return x
 
 def store(filename, contents, binary=False):
     """Stores the given contents to a file on the filesystem"""
