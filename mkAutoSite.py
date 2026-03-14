@@ -7,7 +7,6 @@ import os
 
 def slurp(filename,binary=False, encoding="utf-8"):
     """Utility to slurp a file from the filesystem"""
-    print("OPEN:", filename)
     f = open(filename, "rb")
     x = f.read()
     if not binary:
@@ -55,7 +54,6 @@ def head(count, gen):
 
 def ensureTargetDirectoryExists(config):
     # Ensure target directory exists
-    # destdir = os.path.join(config['target'], config["resources"])
     try:
         os.makedirs(config["destdir"])
     except FileExistsError:
@@ -67,10 +65,6 @@ def copy_static_resources(config):
         if entry.endswith("~"):
             continue
         filename = os.path.basename(entry)
-        print("BASENAME:",os.path.basename(entry))
-        print("DIRNAME:",os.path.dirname(entry))
-        print("TARGET:",config["destdir"])
-        print("SOURCE:", config["resources"])
         target_dir = config["destdir"].replace(config["resources"], os.path.dirname(entry))
         try:
             os.makedirs(target_dir)
@@ -78,15 +72,13 @@ def copy_static_resources(config):
             pass
 
         target_filename = os.path.join(target_dir, filename)
-        print("COPY", entry, target_filename)
         copy(entry, target_filename)
-        print("------------")
 
 
 def createHTMLPagesFromMarkdownTree(config):
     source = config['source']
     target = config['target']
-    tld_default = pagetemplate = slurp(f"{config['resources']}/page-template.html")
+    tld_default = pagetemplate = slurp(f"{config['render-templates']}/page-template.html")
 
     pandoc_command_template = 'pandoc --from markdown+backtick_code_blocks+grid_tables --to html --highlight-style kate %(source)s -o %(dest)s'
 
@@ -94,27 +86,22 @@ def createHTMLPagesFromMarkdownTree(config):
         if not entry.endswith(".md"):
             continue
         filename = entry.replace("markdown/","")
-        print(f"Processed {filename}")
 
         # Ensure the target directory exists for the given filename.
         basename = os.path.basename(filename)
         dirname = os.path.dirname(filename)        # D=$(dirname $filename)
-        print("chtmlfrommd:DIRNAME", repr(dirname))
         if dirname:
             try:
-                pagetemplate = slurp(os.path.join(config['resources'], os.path.join(config['source'], f"{dirname}/page-template.html")))
-                print(f"SLURPED: {dirname}/page-template.html")
+                pagetemplate = slurp(os.path.join(config['render-templates'], f"{dirname}/page-template.html"))
             except FileNotFoundError:
-                print(f"FAILED SLURP {config['resources']}/{dirname}/page-template.html")
+                print(f"FAILED SLURP {config['render-templates']}/{dirname}/page-template.html")
                 pagetemplate = tld_default
-        # pagetemplate = slurp(f"{config['resources']}/page-template.html")
 
         tdirname = os.path.join(target, dirname)
         try:
             os.makedirs(tdirname)                # cd ../auto-site/ ; mkdir -p $D
         except FileExistsError:
             pass
-        print("os.makedirs(tdirname)", tdirname)
 
         # Run the markdown through pandoc to get the content. We create the target page iteratively.
         # We could pull in fields from the markdown+yaml file to throw into the template.
@@ -142,7 +129,9 @@ if __name__ == "__main__":
                 "source" : "markdown",
                 "target" : "auto-site",
                 "resources" : "site-resources",
+                "render-templates" : "templates/render-templates",
              }
+
     config["destdir"] = os.path.join(config['target'], config["resources"])
 
     buildSite(config)
