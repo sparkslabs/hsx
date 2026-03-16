@@ -61,6 +61,17 @@ Defaults:
 * Source file: `markdown.hsx`
 
 
+# Bonus mkAutoSite.py
+
+mkAutoSite is intended to use hsx - in particular it's designed to
+statically compile a collection of templates, HSX files, and markdown files
+to a static website.
+
+This is put here for the moment as an expediency to eradicate having 10
+copies across my filesystem.
+
+
+
 
 ## License
 
