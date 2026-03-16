@@ -24,10 +24,10 @@ def store(filename, contents, binary=False):
 
 # Unix like tools - copy, find, head
 
-def copy(source, dest):
+def copy(source_filename, dest_filename):
     """Slurp and Store"""
-    data = slurp(source, binary=True)
-    store(dest, data, binary=True)
+    data = slurp(source_filename, binary=True)
+    store(dest_filename, data, binary=True)
 
 def find(basedir, t="file"):
     """"Iterator that operates like 'find . -type f' under linux/etc"""
