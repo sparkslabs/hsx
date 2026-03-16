@@ -137,3 +137,5 @@ if __name__ == "__main__":
     config["destdir"] = os.path.join(config['target_base_dirname'], config["resources"])
 
     buildSite(config)
+    print()
+    print(f"python3 -m http.server -d {config["target_base_dirname"]}/")
