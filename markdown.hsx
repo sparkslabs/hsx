@@ -3,6 +3,8 @@
 <Header />
 <Banner banner="Hello World"/>
 
+<FancyFormat formatted_thing="<>"/>
+
 <Trailer> </Trailer>
 <Trailer who="Michael"> </Trailer>
 
