@@ -70,6 +70,9 @@ to a static website.
 This is put here for the moment as an expediency to eradicate having 10
 copies across my filesystem.
 
+# Plan for Autosite
+
+Extend current template processing to build templates from HSX files
 
 
 
