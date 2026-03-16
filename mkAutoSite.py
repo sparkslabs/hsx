@@ -29,7 +29,7 @@ def copy(source_filename, dest_filename):
     data = slurp(source_filename, binary=True)
     store(dest_filename, data, binary=True)
 
-def find(basedir, t="file"):
+def find_files(basedir, t="file"):
     """"Iterator that operates like 'find . -type f' under linux/etc"""
     if t != "file":
         # In theory we could support other types of things we're interested in.
@@ -39,16 +39,15 @@ def find(basedir, t="file"):
     for i in os.listdir(basedir):
         p = os.path.join(basedir, i)
         if os.path.isdir(p):  # Descend into directories, and traverse depth first
-            for j in find(p, t):
+            for j in find_files(p, t):
                 yield j
         else:
             yield p
 
+
 def head(count, gen):
     for i in range(count):
         yield next(gen)
-
-
 
 
 def ensureTargetDirectoryExists(config):
@@ -58,9 +57,10 @@ def ensureTargetDirectoryExists(config):
     except FileExistsError:
         pass
 
+
 def copy_static_resources(config):
     # Copy the site-resources into the target directory
-    for entry in find(config["resources"]):
+    for entry in find_files(config["resources"]):
         if entry.endswith("~"):
             continue
         filename = os.path.basename(entry)
@@ -81,7 +81,7 @@ def createHTMLPagesFromMarkdownTree(config):
 
     pandoc_command_template = 'pandoc --from markdown+backtick_code_blocks+grid_tables --to html --highlight-style kate %(source)s -o %(dest)s'
 
-    for entry in find(source):
+    for entry in find_files(source_base_dirname):
         if not entry.endswith(".md"):
             continue
         filename = entry.replace("markdown/","")
