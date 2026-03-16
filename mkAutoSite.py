@@ -75,16 +75,16 @@ def copy_static_resources(config):
 
 
 def createHTMLPagesFromMarkdownTree(config):
-    source = config['source']
-    target = config['target']
+    source_base_dirname = config['source_base_dirname']
+    target_base_dirname = config['target_base_dirname']
     tld_default = pagetemplate = slurp(f"{config['render-templates']}/page-template.html")
 
-    pandoc_command_template = 'pandoc --from markdown+backtick_code_blocks+grid_tables --to html --highlight-style kate %(source)s -o %(dest)s'
+    pandoc_command_template = 'pandoc --from markdown+backtick_code_blocks+grid_tables --to html --highlight-style kate %(source_file)s -o %(target_filename)s'
 
     for entry in find_files(source_base_dirname):
         if not entry.endswith(".md"):
             continue
-        filename = entry.replace("markdown/","")
+        filename = entry.replace(config["source_base_dirname"]+ "/","")
 
         # Ensure the target directory exists for the given filename.
         basename = os.path.basename(filename)
@@ -93,12 +93,14 @@ def createHTMLPagesFromMarkdownTree(config):
             try:
                 pagetemplate = slurp(os.path.join(config['render-templates'], f"{dirname}/page-template.html"))
             except FileNotFoundError:
-                print(f"FAILED SLURP {config['render-templates']}/{dirname}/page-template.html")
+                print()
+                print(f"  FAILED SLURP {config['render-templates']}/{dirname}/page-template.html")
+                print( "  Using default template")
                 pagetemplate = tld_default
 
-        tdirname = os.path.join(target, dirname)
+        target_directory_name = os.path.join(target_base_dirname, dirname)
         try:
-            os.makedirs(tdirname)                # cd ../auto-site/ ; mkdir -p $D
+            os.makedirs(target_directory_name)                # cd ../auto-site/ ; mkdir -p $D
         except FileExistsError:
             pass
 
@@ -107,30 +109,31 @@ def createHTMLPagesFromMarkdownTree(config):
         # We don't do that right now
 
         corename = basename[:-3]                  # basename=`echo $filename | sed -e "s/.md$//g" ` # strip ".md"
-        target_filename = os.path.join(tdirname, corename)+".html"
+        target_filename = os.path.join(target_directory_name, corename)+".html"
 
-        command = pandoc_command_template % { "source": entry, "dest" : target_filename }
+        command = pandoc_command_template % { "source_file": entry, "target_filename" : target_filename }
         print(command)
         os.system(command)
-        print()
 
         sourcepage = slurp(target_filename)
         newpage = pagetemplate.replace("%CONTENT GOES HERE%", sourcepage)
         store(target_filename, newpage)
+
 
 def buildSite(config):
     ensureTargetDirectoryExists(config)
     copy_static_resources(config)
     createHTMLPagesFromMarkdownTree(config)
 
+
 if __name__ == "__main__":
     config = {
-                "source" : "markdown",
-                "target" : "auto-site",
+                "source_base_dirname" : "pages",
+                "target_base_dirname" : "auto-site",
                 "resources" : "site-resources",
                 "render-templates" : "templates/render-templates",
              }
 
-    config["destdir"] = os.path.join(config['target'], config["resources"])
+    config["destdir"] = os.path.join(config['target_base_dirname'], config["resources"])
 
     buildSite(config)
