@@ -1,2 +1,4 @@
+build/
+src/hsx.egg-info/
 *~
 *.pyc

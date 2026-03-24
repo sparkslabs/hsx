@@ -22,3 +22,5 @@ license-files = ["LICEN[CS]E*"]
 Homepage = "https://github.com/sparkslabs/hsx"
 Issues = "https://github.com/sparkslabs/hsx/issues"
 
+[project.scripts]
+hsx = "hsx:main_cli"

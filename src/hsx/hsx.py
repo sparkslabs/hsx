@@ -256,10 +256,17 @@ def stream_Evaluate(text, tag_regexes):
             result.append(ev_value)
 
     stream_evaluate_depth -= 1
+
     return "".join(result)
 
-if __name__ == "__main__":
+def main_cli():
     import sys
+
+    # Stinky Global Smells
+    global TAG_EXTENSION
+    global stream_evaluate_depth
+    global tag_defs
+    global tag_regexes
 
     TAG_EXTENSION = ".hsx"
     base_dir = "_fragx"
@@ -290,3 +297,6 @@ if __name__ == "__main__":
         store(destfile, evaluated)
     else:
         print(evaluated)
+
+if __name__ == "__main__":
+    main_cli()

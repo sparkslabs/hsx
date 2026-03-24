@@ -5,6 +5,8 @@ all:
 	@echo "dist   - Build package for PyPI"
 	@echo "upload - upload to pypi"
 
+undevinstall:
+	python3 -m pip uninstall hsx  --break-system-package
 
 devinstall:
 	python3 -m pip install .  --break-system-package
