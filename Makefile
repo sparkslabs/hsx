@@ -16,10 +16,10 @@ undevinstall:
 devinstall:
 	python3 -m pip install .  --break-system-package
 
-dist:
+dist: bumprev
 	python3 -m build
 
-dist_to_pypi:
+dist_to_pypi: dist
 	python3 -m twine upload --repository pypi dist/*
 
 clean:
