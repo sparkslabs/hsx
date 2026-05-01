@@ -286,6 +286,10 @@ def main_cli():
         where = sys.argv.index("--destfile")
         destfile = sys.argv[where+1]
 
+    if "--file" in sys.argv:
+        where = sys.argv.index("--file")
+        source_file = sys.argv[where+1]
+
     # TAG_EXTENSION = ".hsx"
     tag_defs = get_tagdefs(base_dir)
     tag_regexes = makeTagParser(tag_defs)
