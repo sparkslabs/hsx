@@ -125,8 +125,7 @@ def buildSite(config):
     copy_static_resources(config)
     createHTMLPagesFromMarkdownTree(config)
 
-
-if __name__ == "__main__":
+def main_cli():
     config = {
                 "source_base_dirname" : "pages",
                 "target_base_dirname" : "auto-site",
@@ -139,3 +138,6 @@ if __name__ == "__main__":
     buildSite(config)
     print()
     print(f"python3 -m http.server -d {config["target_base_dirname"]}/")
+
+if __name__ == "__main__":
+    main_cli()
