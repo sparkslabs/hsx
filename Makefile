@@ -11,10 +11,17 @@ bumprev:
 	./scripts/bump_rev.sh
 
 undevinstall:
-	python3 -m pip uninstall hsx  --break-system-package
+	python3 -m pip uninstall hsx
 
 devinstall:
+	python3 -m pip install .
+
+breaking_undevinstall:
+	python3 -m pip uninstall hsx  --break-system-package
+
+breaking_devinstall:
 	python3 -m pip install .  --break-system-package
+
 
 dist: bumprev
 	python3 -m build
