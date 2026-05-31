@@ -29,8 +29,17 @@
 
 import os
 import re
+import sys
 import math
 from collections import defaultdict
+
+context = {
+    "stream_evaluate_depth": 0,
+    "TAG_EXTENSION" : ".hsx",
+    "base_dir" : "_fragx",
+    "source_file" : "markdown.hsx",
+    "destfile" : None,
+}
 
 def slurp(filename):
     with open(filename) as f:
@@ -48,8 +57,8 @@ def files(directory):
 def tag_sources(directory):
     for entry in files(directory):
         path, name = entry
-        if name.endswith(TAG_EXTENSION):
-            tag = name[:-len(TAG_EXTENSION)] # Remove extension
+        if name.endswith(context["TAG_EXTENSION"]):
+            tag = name[:-len(context["TAG_EXTENSION"])] # Remove extension
             yield path, tag, name
 
 def mkSimpleTagPattern(tags):
@@ -116,11 +125,11 @@ def find_file(tag, tag_defs):
         return os.path.join(dirname, filename)
     raise Exception("Broken Code")
 
-def simple_stream_parse(tags_regexes, text):
+def simple_stream_parse(text):
     # "simple" : re.compile(simple_tag_pattern),
     # "open" : re.compile(open_tag_pattern),
     # "close" : re.compile(close_tag_pattern)
-    tags_regex = tags_regexes["simple"]
+    tags_regex = context["tag_regexes"]["simple"]
     while text:
         simple_start = open_start = close_start = math.inf
         match = None
@@ -128,10 +137,10 @@ def simple_stream_parse(tags_regexes, text):
         # print("OK")
         # We might have any one of these next. We want to check for all three,
         # and use the earliest match
-        simple_match = tags_regexes["simple"].search(text)
-        open_match = tags_regexes["open"].search(text)
-        # print("OPEN MATCH:", tags_regexes["open"], open_match)
-        close_match = tags_regexes["close"].search(text)
+        simple_match = context["tag_regexes"]["simple"].search(text)
+        open_match = context["tag_regexes"]["open"].search(text)
+        # print("OPEN MATCH:", context["tag_regexes"]["open"], open_match)
+        close_match = context["tag_regexes"]["close"].search(text)
 
         if simple_match: simple_start = simple_match.start()
         if open_match: open_start = open_match.start()
@@ -171,7 +180,7 @@ def simple_stream_parse(tags_regexes, text):
 
 def evaluate_block_tag(tag, args):
     # Find the file to insert into
-    replacement_file = find_file(tag, tag_defs)
+    replacement_file = find_file(tag, context["tag_defs"])
     # print(f"File-- {tag} {replacement_file}")
 
     # Grab the file text
@@ -181,7 +190,7 @@ def evaluate_block_tag(tag, args):
     for arg in args:
         t = t.replace("{args." + arg + "}", args[arg])
 
-    t = stream_Evaluate(t, tag_regexes)
+    t = stream_Evaluate(t)
 
     return t
 
@@ -215,18 +224,20 @@ def makeTagParser(tag_defs):
     }
     return tag_regexes
 
-def stream_Evaluate(text, tag_regexes):
-    global stream_evaluate_depth
-    stream_evaluate_depth += 1
-    if stream_evaluate_depth > 30:
+
+def stream_Evaluate(text):
+
+    context["stream_evaluate_depth"] += 1
+    if context["stream_evaluate_depth"] > 30:
         print("Warning, deep recursion for stream_Evaluate in processing - consider refactoring")
-    if stream_evaluate_depth > 50:
-        raise Exception("Recursion limit for stream_Evaluate exceeded, refactor your content")
+    if context["stream_evaluate_depth"] > 50:
+        raise Exception("Recursion limit for stream_Evaluate exceeded, refactor your context")
+
     # Basic Stream Parser
     result = []
     result_stack = []
     block_tag_stack = []
-    for event in simple_stream_parse(tag_regexes, text):
+    for event in simple_stream_parse(text):
         ev_type, ev_value = event
         # print(ev_type, ev_value) 
         if ev_type == ("tag", "simple"):
@@ -255,50 +266,54 @@ def stream_Evaluate(text, tag_regexes):
         else:
             result.append(ev_value)
 
-    stream_evaluate_depth -= 1
+    context["stream_evaluate_depth"] -= 1
 
     return "".join(result)
 
+def usage():
+    print(f"{context["appname"]} [OPTIONS]")
+    print()
+    print(f"    --dir <directory>     [ {context["base_dir"]} ]  # Fragment directory")
+    print(f"    --extension <ext>     [ {context["TAG_EXTENSION"]} ]  # Fragment file extension")
+    print(f"    --destfile <filename> [ {context["destfile"]} ]  # Write output to file instead of stdout")
+    print(f"    --file <filename>     [ {context["source_file"]} ]  # Filename to process")
+
+
 def main_cli():
-    import sys
 
-    # Stinky Global Smells
-    global TAG_EXTENSION
-    global stream_evaluate_depth
-    global tag_defs
-    global tag_regexes
-
-    TAG_EXTENSION = ".hsx"
-    base_dir = "_fragx"
-    source_file = "markdown.hsx"
-    destfile = None
+    global context
+    context["appname"] = os.path.basename(sys.argv[0])
 
     # Fragile options handling
     if "--dir" in sys.argv:
         where = sys.argv.index("--dir")
-        base_dir = sys.argv[where+1]
+        context["base_dir"] = sys.argv[where+1]
 
     if "--extension" in sys.argv:
         where = sys.argv.index("--extension")
-        TAG_EXTENSION = sys.argv[where+1]
+        context["TAG_EXTENSION"] = sys.argv[where+1]
 
     if "--destfile" in sys.argv:
         where = sys.argv.index("--destfile")
-        destfile = sys.argv[where+1]
+        context["destfile"] = sys.argv[where+1]
 
     if "--file" in sys.argv:
         where = sys.argv.index("--file")
-        source_file = sys.argv[where+1]
+        context["source_file"] = sys.argv[where+1]
+
+    if "--help" in sys.argv:
+        usage()
+        sys.exit(0)
 
     # TAG_EXTENSION = ".hsx"
-    tag_defs = get_tagdefs(base_dir)
-    tag_regexes = makeTagParser(tag_defs)
+    context["tag_defs"] = get_tagdefs(context["base_dir"])
+    context["tag_regexes"] = makeTagParser(context["tag_defs"])
 
-    text = slurp(source_file)
-    stream_evaluate_depth = 0
-    evaluated = stream_Evaluate(text, tag_regexes)
-    if destfile:
-        store(destfile, evaluated)
+    text = slurp(context["source_file"])
+    context["stream_evaluate_depth"] = 0
+    evaluated = stream_Evaluate(text)
+    if context["destfile"]:
+        store(context["destfile"], evaluated)
     else:
         print(evaluated)
 
