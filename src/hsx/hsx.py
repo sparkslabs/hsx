@@ -147,21 +147,6 @@ def find_file(tag, tag_defs):
     raise Exception("Broken Code")
 
 
-def evaluate_block_tag(tag, args):
-    # Find the file to insert into
-    replacement_file = find_file(tag, context["tag_defs"])
-    # print(f"File-- {tag} {replacement_file}")
-
-    # Grab the file text
-    t = slurp(replacement_file)
-
-    # Insert the arguments if they exist
-    for arg in args:
-        t = t.replace("{args." + arg + "}", args[arg])
-
-    t = stream_Evaluate(t)
-
-    return t
 
 
 def get_tagdefs(source_dir):
@@ -239,6 +224,23 @@ def simple_stream_parse(text):
             # We're after the last tag, so just yield that
             yield ("text", text)
             text = ""
+
+def evaluate_block_tag(tag, args):
+    # Find the file to insert into
+    replacement_file = find_file(tag, context["tag_defs"])
+    # print(f"File-- {tag} {replacement_file}")
+
+    # Grab the file text
+    t = slurp(replacement_file)
+
+    # Insert the arguments if they exist
+    for arg in args:
+        t = t.replace("{args." + arg + "}", args[arg])
+
+    t = stream_Evaluate(t)
+
+    return t
+
 
 def evaluate_simple_tag(ev_value):
     # Extract the tag and arguments
