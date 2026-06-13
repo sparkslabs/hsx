@@ -162,6 +162,10 @@ def parse_tag(raw_tag_text, block=False):
 
 
 def simple_stream_parse(text):
+    """simple_stream_parse(text) -> iterator of (event_type, data)
+    event_type is either "text" or "tag"
+    """
+
     # "simple" : re.compile(simple_tag_pattern),
     # "open" : re.compile(open_tag_pattern),
     # "close" : re.compile(close_tag_pattern)
@@ -204,7 +208,7 @@ def simple_stream_parse(text):
             tag_text = text[match.start():match.end()]
 
             yield ("text", pre_tag_text)
-            yield (("tag", match_type), tag_text)
+            yield ("tag", (match_type, tag_text))
 
             remaining_text = text[match.end():]
             text = remaining_text
@@ -264,37 +268,38 @@ def stream_Evaluate(text):
     for event in simple_stream_parse(text):
         ev_type, ev_value = event
         # print(ev_type, ev_value) 
-        if ev_type == ("tag", "simple"):
-            replacement_text = evaluate_simple_tag(ev_value)
-            result.append(replacement_text)
-
-        elif ev_type == ("tag", "open"):
-            open_tag, args = parse_tag(ev_value, block=True)
-            # print(f"OPEN TAG: {open_tag} attrs: {args}")
-            block_tag_stack.append( (open_tag, args, result) )
-            result = []  # New local result
-
-        elif ev_type == ("tag", "close"):
-            close_tag = ev_value[2:-1].strip()  # This is guaranteed safe, or else we can't reach here
-            (open_tag, args, enclosing_result) = block_tag_stack.pop()
-            if open_tag != close_tag:
-                raise Exception(f"Structural error. Saw {close_tag} close tag but was expecting a matching {open_tag}")
-            # print("CLOSING TAG", close_tag)
-            block_text = "".join(result)
-            args["__text__"] = block_text # Inject the block value into args
-
-            result = enclosing_result  # Move back to the outer layer
-            replacement_text = evaluate_block_tag(close_tag, args)
-            result.append(replacement_text)
-
-        else:
+        if ev_type == "text":
             result.append(ev_value)
+            continue
+
+        if ev_type == "tag":
+            tag_type, tag_value = ev_value
+            if tag_type == "simple":
+                replacement_text = evaluate_simple_tag(tag_value)
+                result.append(replacement_text)
+
+            elif tag_type == "open":
+                open_tag, args = parse_tag(tag_value, block=True)
+                # print(f"OPEN TAG: {open_tag} attrs: {args}")
+                block_tag_stack.append( (open_tag, args, result) )
+                result = []  # New local result
+
+            elif tag_type == "close":
+                close_tag = tag_value[2:-1].strip()  # This is guaranteed safe, or else we can't reach here
+                (open_tag, args, enclosing_result) = block_tag_stack.pop()
+                if open_tag != close_tag:
+                    raise Exception(f"Structural error. Saw {close_tag} close tag but was expecting a matching {open_tag}")
+                # print("CLOSING TAG", close_tag)
+                block_text = "".join(result)
+                args["__text__"] = block_text # Inject the block value into args
+
+                result = enclosing_result  # Move back to the outer layer
+                replacement_text = evaluate_block_tag(close_tag, args)
+                result.append(replacement_text)
 
     context["stream_evaluate_depth"] -= 1
 
     return "".join(result)
-
-
 
 
 def get_tagdefs(source_dir):
