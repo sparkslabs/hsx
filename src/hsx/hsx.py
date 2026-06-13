@@ -163,12 +163,6 @@ def evaluate_block_tag(tag, args):
 
     return t
 
-def evaluate_simple_tag(ev_value):
-    # Extract the tag and arguments
-    tag, args = parse_tag(ev_value)
-
-    t = evaluate_block_tag(tag, args)
-    return t
 
 def get_tagdefs(source_dir):
     tag_defs = defaultdict(list)
@@ -246,6 +240,12 @@ def simple_stream_parse(text):
             yield ("text", text)
             text = ""
 
+def evaluate_simple_tag(ev_value):
+    # Extract the tag and arguments
+    tag, args = parse_tag(ev_value)
+
+    t = evaluate_block_tag(tag, args)
+    return t
 
 
 def stream_Evaluate(text):
