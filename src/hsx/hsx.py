@@ -124,12 +124,11 @@ def parse_tag(raw_tag_text, block=False):
     #   p = f'<({"|".join(tags)})( +[a-zA-Z_0-9]*="[^"]*")* *>'
     # So we combine the parsing here
 
-    end_trim = -2
-    if block:
-        end_trim = -1
-    raw_tag_text = raw_tag_text[1:end_trim]
-    m = re.search(" ", raw_tag_text)
-    if m:
+    trim = -1 if block else -2
+    raw_tag_text = raw_tag_text[1:trim] # remove leading `<` and trailing ( `>` or `/>` )
+
+    has_attrs = m = re.search(" ", raw_tag_text)
+    if has_attrs:
         tag = raw_tag_text[:m.start()]
         rest = raw_tag_text[m.end():].strip()
         args = parse_attrs(rest)
