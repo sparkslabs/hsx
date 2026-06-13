@@ -138,13 +138,6 @@ def parse_tag(raw_tag_text, block=False):
     return tag, args
 
 
-def find_file(tag, tag_defs):
-    # We know that the tag must be in tag_defs because tag is derived from tag_defs
-    candidates = tag_defs[tag]
-    if len(candidates) == 1:
-        dirname, filename = candidates[0]
-        return os.path.join(dirname, filename)
-    raise Exception("Broken Code")
 
 
 
@@ -224,6 +217,16 @@ def simple_stream_parse(text):
             # We're after the last tag, so just yield that
             yield ("text", text)
             text = ""
+
+
+def find_file(tag, tag_defs):
+    # We know that the tag must be in tag_defs because tag is derived from tag_defs
+    candidates = tag_defs[tag]
+    if len(candidates) == 1:
+        dirname, filename = candidates[0]
+        return os.path.join(dirname, filename)
+    raise Exception("Broken Code")
+
 
 def evaluate_block_tag(tag, args):
     # Find the file to insert into
