@@ -89,6 +89,20 @@ def mkCloseTagPattern(tags):
     p = f'</({"|".join(tags)}) *>'
     return p
 
+def makeTagParser(tag_defs):
+    # Make Tag Parser
+    simple_tag_pattern = mkSimpleTagPattern(tag_defs.keys())
+    open_tag_pattern = mkOpenTagPattern(tag_defs.keys())
+    close_tag_pattern = mkCloseTagPattern(tag_defs.keys())
+
+    tag_regexes = {
+        "simple" : re.compile(simple_tag_pattern),
+        "open" : re.compile(open_tag_pattern),
+        "close" : re.compile(close_tag_pattern)
+    }
+    return tag_regexes
+
+
 def parse_attrs(attr_text):
     """parse_attrs(attr_text) -> dict[attr] -> value
     Takes the attr_text part of a opening/self-closing tag and parses it
@@ -146,20 +160,6 @@ def parse_tag(raw_tag_text, block=False):
         args = {}
     return tag, args
 
-
-
-def makeTagParser(tag_defs):
-    # Make Tag Parser
-    simple_tag_pattern = mkSimpleTagPattern(tag_defs.keys())
-    open_tag_pattern = mkOpenTagPattern(tag_defs.keys())
-    close_tag_pattern = mkCloseTagPattern(tag_defs.keys())
-
-    tag_regexes = {
-        "simple" : re.compile(simple_tag_pattern),
-        "open" : re.compile(open_tag_pattern),
-        "close" : re.compile(close_tag_pattern)
-    }
-    return tag_regexes
 
 def simple_stream_parse(text):
     # "simple" : re.compile(simple_tag_pattern),
@@ -293,6 +293,7 @@ def stream_Evaluate(text):
     context["stream_evaluate_depth"] -= 1
 
     return "".join(result)
+
 
 
 
