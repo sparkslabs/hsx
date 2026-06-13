@@ -139,19 +139,6 @@ def parse_tag(raw_tag_text, block=False):
 
 
 
-
-
-
-def get_tagdefs(source_dir):
-    tag_defs = defaultdict(list)
-
-    for entry in tag_sources(source_dir):
-        domain, tag, tagsource = entry
-        # print("domain, tag, tagsource")
-        # print(f"{tag, domain, tagsource}")
-        tag_defs[tag].append( (domain, tagsource) )
-    return tag_defs
-
 def makeTagParser(tag_defs):
     # Make Tag Parser
     simple_tag_pattern = mkSimpleTagPattern(tag_defs.keys())
@@ -305,6 +292,17 @@ def usage():
     print(f"    --extension <ext>     [ {context["TAG_EXTENSION"]} ]  # Fragment file extension")
     print(f"    --destfile <filename> [ {context["destfile"]} ]  # Write output to file instead of stdout")
     print(f"    --file <filename>     [ {context["source_file"]} ]  # Filename to process")
+
+
+def get_tagdefs(source_dir):
+    tag_defs = defaultdict(list)
+
+    for entry in tag_sources(source_dir):
+        domain, tag, tagsource = entry
+        # print("domain, tag, tagsource")
+        # print(f"{tag, domain, tagsource}")
+        tag_defs[tag].append( (domain, tagsource) )
+    return tag_defs
 
 
 def main_cli():
