@@ -41,6 +41,15 @@ context = {
     "destfile" : None,
 }
 
+def usage():
+    print(f"{context["appname"]} [OPTIONS]")
+    print()
+    print(f"    --dir <directory>     [ {context["base_dir"]} ]  # Fragment directory")
+    print(f"    --extension <ext>     [ {context["TAG_EXTENSION"]} ]  # Fragment file extension")
+    print(f"    --destfile <filename> [ {context["destfile"]} ]  # Write output to file instead of stdout")
+    print(f"    --file <filename>     [ {context["source_file"]} ]  # Filename to process")
+
+
 def slurp(filename):
     """Read the given file, return as a string"""
     with open(filename) as f:
@@ -285,13 +294,6 @@ def stream_Evaluate(text):
 
     return "".join(result)
 
-def usage():
-    print(f"{context["appname"]} [OPTIONS]")
-    print()
-    print(f"    --dir <directory>     [ {context["base_dir"]} ]  # Fragment directory")
-    print(f"    --extension <ext>     [ {context["TAG_EXTENSION"]} ]  # Fragment file extension")
-    print(f"    --destfile <filename> [ {context["destfile"]} ]  # Write output to file instead of stdout")
-    print(f"    --file <filename>     [ {context["source_file"]} ]  # Filename to process")
 
 
 def get_tagdefs(source_dir):
