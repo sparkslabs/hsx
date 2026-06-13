@@ -42,19 +42,23 @@ context = {
 }
 
 def slurp(filename):
+    """Read the given file, return as a string"""
     with open(filename) as f:
         return f.read()
 
 def store(filename, what, mode="w"):
+    """Take the contents of `what` and store it in the given file"""
     with open(filename, mode) as f:
         return f.write(what)
 
 def files(directory):
+    """Return an iterator listing the files in a given directory"""
     for entry in os.listdir(directory):
         if os.path.isfile(os.path.join(directory,entry)):
             yield directory, entry
 
 def tag_sources(directory):
+    """Look for files inside a directory which define tags, based on TAG_EXTENSION"""
     for entry in files(directory):
         path, name = entry
         if name.endswith(context["TAG_EXTENSION"]):
@@ -62,18 +66,26 @@ def tag_sources(directory):
             yield path, tag, name
 
 def mkSimpleTagPattern(tags):
+    """Pattern matching simple self closing of style <TAG />"""
     p = f'<({"|".join(tags)}) ( *[a-zA-Z_0-9]*="[^"]*")* */>'
     return p
 
 def mkOpenTagPattern(tags):
+    """Pattern matching opening block tag pattern <TAG> or <TAG arg1="..."  arg2="..." >"""
     p = f'<({"|".join(tags)})( +[a-zA-Z_0-9]*="[^"]*")* *>'
     return p
 
 def mkCloseTagPattern(tags):
+    """Pattern matching closing block tag pattern </TAG>"""
     p = f'</({"|".join(tags)}) *>'
     return p
 
 def parse_attrs(attr_text):
+    """parse_attrs(attr_text) -> dict[attr] -> value
+    Takes the attr_text part of a opening/self-closing tag and parses it
+    into a dictionary"""
+
+    # Precondition to reach here:
     # We know the text provided matches the following pattern:
     #    f'( *[a-zA-Z_0-9]*="[^"]*")'
 
@@ -96,6 +108,15 @@ def parse_attrs(attr_text):
     return attrs
 
 def parse_tag(raw_tag_text, block=False):
+    """parse_tag(raw_tag_text, block) -> tag:string , args:dict[arg->value]"""
+
+    # Precondition for reaching here:
+    # The raw_tag_text has either matched an open tag or self-closing tag.
+    # As a result, we can make safe assumptions here about parsing the raw_tag_text
+
+    # In particular, one ends `>` the other ends `/>`.
+    # Once we remove the start/end the parsing is identical.
+
     # We know the text provided matches the following pattern if block is false:
     #    f'<({"|".join(tags)}) ( *[a-zA-Z_0-9]*="[^"]*")* */>'
     #
