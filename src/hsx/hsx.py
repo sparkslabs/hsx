@@ -137,6 +137,7 @@ def parse_tag(raw_tag_text, block=False):
         args = {}
     return tag, args
 
+
 def find_file(tag, tag_defs):
     # We know that the tag must be in tag_defs because tag is derived from tag_defs
     candidates = tag_defs[tag]
@@ -144,6 +145,53 @@ def find_file(tag, tag_defs):
         dirname, filename = candidates[0]
         return os.path.join(dirname, filename)
     raise Exception("Broken Code")
+
+
+def evaluate_block_tag(tag, args):
+    # Find the file to insert into
+    replacement_file = find_file(tag, context["tag_defs"])
+    # print(f"File-- {tag} {replacement_file}")
+
+    # Grab the file text
+    t = slurp(replacement_file)
+
+    # Insert the arguments if they exist
+    for arg in args:
+        t = t.replace("{args." + arg + "}", args[arg])
+
+    t = stream_Evaluate(t)
+
+    return t
+
+def evaluate_simple_tag(ev_value):
+    # Extract the tag and arguments
+    tag, args = parse_tag(ev_value)
+
+    t = evaluate_block_tag(tag, args)
+    return t
+
+def get_tagdefs(source_dir):
+    tag_defs = defaultdict(list)
+
+    for entry in tag_sources(source_dir):
+        domain, tag, tagsource = entry
+        # print("domain, tag, tagsource")
+        # print(f"{tag, domain, tagsource}")
+        tag_defs[tag].append( (domain, tagsource) )
+    return tag_defs
+
+def makeTagParser(tag_defs):
+    # Make Tag Parser
+    simple_tag_pattern = mkSimpleTagPattern(tag_defs.keys())
+    open_tag_pattern = mkOpenTagPattern(tag_defs.keys())
+    close_tag_pattern = mkCloseTagPattern(tag_defs.keys())
+
+    tag_regexes = {
+        "simple" : re.compile(simple_tag_pattern),
+        "open" : re.compile(open_tag_pattern),
+        "close" : re.compile(close_tag_pattern)
+    }
+    return tag_regexes
 
 def simple_stream_parse(text):
     # "simple" : re.compile(simple_tag_pattern),
@@ -198,51 +246,6 @@ def simple_stream_parse(text):
             yield ("text", text)
             text = ""
 
-def evaluate_block_tag(tag, args):
-    # Find the file to insert into
-    replacement_file = find_file(tag, context["tag_defs"])
-    # print(f"File-- {tag} {replacement_file}")
-
-    # Grab the file text
-    t = slurp(replacement_file)
-
-    # Insert the arguments if they exist
-    for arg in args:
-        t = t.replace("{args." + arg + "}", args[arg])
-
-    t = stream_Evaluate(t)
-
-    return t
-
-def evaluate_simple_tag(ev_value):
-    # Extract the tag and arguments
-    tag, args = parse_tag(ev_value)
-
-    t = evaluate_block_tag(tag, args)
-    return t
-
-def get_tagdefs(source_dir):
-    tag_defs = defaultdict(list)
-
-    for entry in tag_sources(source_dir):
-        domain, tag, tagsource = entry
-        # print("domain, tag, tagsource")
-        # print(f"{tag, domain, tagsource}")
-        tag_defs[tag].append( (domain, tagsource) )
-    return tag_defs
-
-def makeTagParser(tag_defs):
-    # Make Tag Parser
-    simple_tag_pattern = mkSimpleTagPattern(tag_defs.keys())
-    open_tag_pattern = mkOpenTagPattern(tag_defs.keys())
-    close_tag_pattern = mkCloseTagPattern(tag_defs.keys())
-
-    tag_regexes = {
-        "simple" : re.compile(simple_tag_pattern),
-        "open" : re.compile(open_tag_pattern),
-        "close" : re.compile(close_tag_pattern)
-    }
-    return tag_regexes
 
 
 def stream_Evaluate(text):
