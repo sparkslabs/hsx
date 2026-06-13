@@ -251,23 +251,23 @@ def evaluate_block_tag(tag, args):
     # print(f"File-- {tag} {replacement_file}")
 
     # Grab the file text
-    t = slurp(replacement_file)
+    working_text = slurp(replacement_file)
 
     # Insert the arguments if they exist
     for arg in args:
-        t = t.replace("{args." + arg + "}", args[arg])
+        working_text = working_text.replace("{args." + arg + "}", args[arg])
 
-    t = stream_Evaluate(t)
+    evaluated_text = stream_Evaluate(working_text)
 
-    return t
+    return evaluated_text
 
 
 def evaluate_simple_tag(ev_value):
     # Extract the tag and arguments
     tag, args = parse_tag(ev_value)
 
-    t = evaluate_block_tag(tag, args)
-    return t
+    evaluated_text = evaluate_block_tag(tag, args)
+    return evaluated_text
 
 
 def stream_Evaluate(text):
