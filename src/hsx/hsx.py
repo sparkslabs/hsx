@@ -163,7 +163,11 @@ def parse_tag(raw_tag_text, block=False):
 
 def simple_stream_parse(text):
     """simple_stream_parse(text) -> iterator of (event_type, data)
-    event_type is either "text" or "tag"
+
+    event_type := "text" | "tag"
+
+    This iterates a stream of events:
+        event_stream := ( text_event tag_event )*   text_event
     """
 
     # "simple" : re.compile(simple_tag_pattern),
@@ -220,11 +224,24 @@ def simple_stream_parse(text):
 
 
 def find_file(tag, tag_defs):
+    """find_file(tag, tag_defs)  tag_name -> Filename defining the tag
+    Returns the filename defining a tag detected.
+    This is extracted from the structure where we defined the tags in the first place.
+
+    This allows the evaulator to replace the tag / tag block with the text
+    from the tag definition file
+    """
+
     # We know that the tag must be in tag_defs because tag is derived from tag_defs
     candidates = tag_defs[tag]
     if len(candidates) == 1:
         dirname, filename = candidates[0]
         return os.path.join(dirname, filename)
+
+    # TODO: If we reach here, the list of candidates is longer than 1
+    # That would mean that a tag is defined in multiple files in source directory.
+    # This opens up options which are not currently used.
+
     raise Exception("Broken Code")
 
 
