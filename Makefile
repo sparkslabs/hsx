@@ -2,6 +2,7 @@
 all:
 	@echo "Targets"
 	@echo
+	@echo "examples   - Build and run all examples in dev mode"
 	@echo "bumprev    - Sync all the version strings with VERSION in this directory - prior to release"
 	@echo "devinstall - install locally with 'break system packages'"
 	@echo "dist       - Build package for PyPI"
@@ -26,3 +27,21 @@ clean:
 	rm -rf build/
 	rm -rf dist/
 	rm -rf src/hsx.egg-info/
+
+VENV := .venv
+PYTHON := $(VENV)/bin/python
+HSX := $(VENV)/bin/hsx
+
+$(HSX): pyproject.toml
+	python3 -m venv $(VENV)
+	$(PYTHON) -m pip install -e .
+
+eg-1: $(HSX)
+	$(MAKE) -C examples/hsx/01-simple HSX=$(abspath $(HSX))
+
+# eg-2: $(HSX)
+# 	$(MAKE) -C examples/hsx/01-simple HSX=$(abspath $(HSX))
+
+
+# examples: example-1 example-2
+examples: eg-1
